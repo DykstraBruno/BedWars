@@ -1572,6 +1572,18 @@ public class PlayerListener {
 
         if (!ArenaUtils.isInArea(event.newLocation(), game.get().getPos1(), game.get().getPos2())) {
             event.cancelled(true);
+            return;
+        }
+
+        var targetIsRespawning = game.get().getPlayers().stream()
+                .anyMatch(p -> p.isSpectator()
+                        && game.get().getPlayerTeam(p) != null
+                        && event.newLocation().getDistanceSquared(p.getLocation()) < 4.0);
+
+        if (targetIsRespawning) {
+            event.cancelled(true);
+            event.player().sendMessage(Message.ofRichText("<red>That player is awaiting respawn.")
+                    .prefixOrDefault(game.get().getCustomPrefixComponent()));
         }
     }
 }
